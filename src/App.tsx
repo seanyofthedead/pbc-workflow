@@ -13,9 +13,7 @@ import { KpiTiles } from './components/KpiTiles'
 import { LifecyclePipeline } from './components/LifecyclePipeline'
 import { RequestGenerationCard } from './components/RequestGenerationCard'
 import { RequestQueue } from './components/RequestQueue'
-import { RoiPanel } from './components/RoiPanel'
 import { ValidationPanel } from './components/ValidationPanel'
-import { WorkflowComparison } from './components/WorkflowComparison'
 import { initialDocuments } from './data/documents'
 import { validate } from './lib/validate'
 import type { AuditLogEntry, PbcDocument, ValidationResult } from './types'
@@ -247,11 +245,6 @@ function App() {
               />
             </DemoSpotlight>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <WorkflowComparison />
-          <RoiPanel />
         </div>
 
         <footer className="pt-2 pb-6 text-center text-xs text-slate-500">
