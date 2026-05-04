@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   signInWithRedirect,
   signOut,
-  fetchUserAttributes,
+  fetchAuthSession,
 } from 'aws-amplify/auth'
 import { Hub } from 'aws-amplify/utils'
 
@@ -42,10 +42,12 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
     async function checkUser() {
       try {
-        const attrs = await fetchUserAttributes()
-        if (!cancelled) {
-          setAuth({ status: 'signedIn', email: attrs.email ?? '(no email)' })
-        }
+        const session = await fetchAuthSession()
+        const idToken = session.tokens?.idToken
+        if (!idToken) throw new Error('no id token')
+        const email =
+          (idToken.payload.email as string | undefined) ?? '(no email)'
+        if (!cancelled) setAuth({ status: 'signedIn', email })
       } catch {
         if (cancelled || redirectingRef.current) return
         redirectingRef.current = true
