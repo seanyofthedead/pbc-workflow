@@ -35,16 +35,16 @@ export function DecisionLog({ entries }: { entries: AuditLogEntry[] }) {
             No validation events yet. Run a validation to populate the audit trail.
           </div>
         ) : (
-          <ol className="relative pl-5">
+          <ol className="relative pl-7">
             <span
               aria-hidden
-              className="absolute left-2 top-2 bottom-2 w-px bg-slate-200"
+              className="absolute left-3.5 top-2 bottom-2 w-px bg-slate-200"
             />
             {entries.map((e) => {
               const Icon = kindIcon[e.kind]
               return (
                 <li key={e.id} className="relative pb-4 last:pb-0">
-                  <span className="absolute -left-3.5 top-0.5 h-5 w-5 rounded-full bg-white border border-slate-300 flex items-center justify-center">
+                  <span className="absolute -left-6 top-0.5 h-5 w-5 rounded-full bg-white border border-slate-300 flex items-center justify-center">
                     <Icon size={11} className="text-slate-600" strokeWidth={2.25} />
                   </span>
                   <div className="text-sm text-slate-900 font-medium leading-tight">
