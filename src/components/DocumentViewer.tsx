@@ -28,7 +28,7 @@ export function DocumentViewer({ document: doc, result }: Props) {
     <Card>
       <CardHeader
         title="Document Viewer"
-        description="Simulated rendering — fields with validation issues are highlighted"
+        description="Fields with validation issues are highlighted"
         right={
           <Badge tone="neutral">
             <FileText size={12} />
