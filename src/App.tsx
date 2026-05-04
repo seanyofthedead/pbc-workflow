@@ -255,7 +255,7 @@ function App() {
         </div>
 
         <footer className="pt-2 pb-6 text-center text-xs text-slate-500">
-          PBC Workflow demo · Front-end only · All integrations simulated in-memory
+          PBC Workflow demo
         </footer>
       </main>
 
