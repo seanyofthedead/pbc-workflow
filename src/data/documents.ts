@@ -16,6 +16,8 @@ export const initialDocuments: PbcDocument[] = [
     requiredPeriod: { ...Q3_2026 },
     status: 'Pending Validation',
     riskLevel: 'Low',
+    riskRationale:
+      'Operating account variance has stayed below 1% for 8 straight quarters; routine confirmation only.',
     financialData: {
       currency: 'USD',
       glBalance: 1_482_650.32,
@@ -53,6 +55,8 @@ export const initialDocuments: PbcDocument[] = [
     requiredPeriod: { ...Q3_2026 },
     status: 'Pending Validation',
     riskLevel: 'Medium',
+    riskRationale:
+      'Payroll cut-off had timing differences in Q2 2026 that required a $9.4k adjustment; auto-flagged for closer review.',
     financialData: {
       currency: 'USD',
       glBalance: 312_904.18,
@@ -87,6 +91,8 @@ export const initialDocuments: PbcDocument[] = [
     requiredPeriod: { ...Q3_2026 },
     status: 'Pending Validation',
     riskLevel: 'High',
+    riskRationale:
+      'Treasury sweeps left a $14k unreconciled variance in Q2 2026; ERP risk model flagged repeat exposure for Q3.',
     financialData: {
       currency: 'USD',
       glBalance: 4_205_117.0,
@@ -123,6 +129,8 @@ export const initialDocuments: PbcDocument[] = [
     requiredPeriod: { ...Q3_2026 },
     status: 'Pending Validation',
     riskLevel: 'Medium',
+    riskRationale:
+      'EUR rate volatility in Q3 triggered an FX revaluation anomaly in the upstream GL scan; period alignment must be verified.',
     financialData: {
       currency: 'USD',
       glBalance: 612_450.0,
@@ -159,6 +167,8 @@ export const initialDocuments: PbcDocument[] = [
     requiredPeriod: { ...Q3_2026 },
     status: 'Pending Validation',
     riskLevel: 'High',
+    riskRationale:
+      'Lockbox controls deficiency was identified in the interim PCAOB walkthrough; full supporting package required.',
     financialData: {
       currency: 'USD',
       glBalance: 854_220.0,

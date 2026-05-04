@@ -10,10 +10,10 @@ export function Header() {
           </div>
           <div>
             <h1 className="text-base font-semibold text-slate-900 leading-tight tracking-tight">
-              PBC Workflow
+              PBC Orchestrator
             </h1>
             <p className="text-xs text-slate-500 leading-tight">
-              Auto-Validation Gate · Q3 2026 Audit Cycle
+              Early Validation Gate · Q3 2026 Audit Cycle
             </p>
           </div>
         </div>

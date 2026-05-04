@@ -52,6 +52,7 @@ export interface PbcDocument {
   requiredPeriod: { start: string; end: string }
   status: DocStatus
   riskLevel: RiskLevel
+  riskRationale: string
   financialData: FinancialData
   requiredChecklist: ChecklistItem[]
   signaturePresent: boolean

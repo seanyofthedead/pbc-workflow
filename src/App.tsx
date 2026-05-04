@@ -1,8 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { DecisionLog } from './components/DecisionLog'
+import {
+  DemoModeControls,
+  DemoPauseHint,
+  DemoSpotlight,
+} from './components/DemoMode'
+import { demoSteps } from './components/demo-steps'
 import { DocumentViewer } from './components/DocumentViewer'
 import { Header } from './components/Header'
+import { Hero } from './components/Hero'
 import { KpiTiles } from './components/KpiTiles'
+import { LifecyclePipeline } from './components/LifecyclePipeline'
+import { RequestGenerationCard } from './components/RequestGenerationCard'
 import { RequestQueue } from './components/RequestQueue'
 import { RoiPanel } from './components/RoiPanel'
 import { ValidationPanel } from './components/ValidationPanel'
@@ -12,6 +21,8 @@ import { validate } from './lib/validate'
 import type { AuditLogEntry, PbcDocument, ValidationResult } from './types'
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+const DEMO_TARGET_DOC_ID = 'PBC-1043'
 
 function buildLog(
   doc: PbcDocument,
@@ -79,6 +90,9 @@ function App() {
   const [runningId, setRunningId] = useState<string | null>(null)
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([])
 
+  const [demoActive, setDemoActive] = useState(false)
+  const [demoStep, setDemoStep] = useState(0)
+
   const selected = useMemo(
     () => documents.find((d) => d.id === selectedId) ?? documents[0],
     [documents, selectedId],
@@ -91,15 +105,16 @@ function App() {
     ])
   }
 
-  const handleRun = async () => {
+  const handleRun = async (overrideId?: string) => {
     if (runningId) return
-    const doc = selected
+    const doc = overrideId
+      ? documents.find((d) => d.id === overrideId) ?? selected
+      : selected
     setRunningId(doc.id)
 
     const result = validate(doc)
     const events = buildLog(doc, result)
 
-    // Stage SharePoint + Power Apps signals first ("AI is thinking").
     await wait(550)
     appendLog(events[0])
     await wait(450)
@@ -108,10 +123,8 @@ function App() {
     appendLog(events[2])
     await wait(550)
 
-    // Decision lands.
     appendLog(events[3])
 
-    // Result is shown to user now.
     setResults((prev) => ({ ...prev, [doc.id]: result }))
     setDocuments((prev) =>
       prev.map((d) =>
@@ -135,32 +148,104 @@ function App() {
     setRunningId(null)
   }
 
+  const startDemo = () => {
+    setSelectedId(DEMO_TARGET_DOC_ID)
+    setDemoStep(0)
+    setDemoActive(true)
+  }
+
+  const exitDemo = () => {
+    setDemoActive(false)
+  }
+
+  const restartDemo = () => {
+    setResults({})
+    setAuditLog([])
+    setDocuments(initialDocuments)
+    setSelectedId(DEMO_TARGET_DOC_ID)
+    setDemoStep(0)
+    setDemoActive(true)
+  }
+
+  const advanceDemo = async () => {
+    const next = demoStep + 1
+    if (next >= demoSteps.length) return
+
+    if (demoSteps[demoStep].target === 'document' && !results[DEMO_TARGET_DOC_ID]) {
+      setDemoStep(next)
+      void handleRun(DEMO_TARGET_DOC_ID)
+      return
+    }
+
+    setDemoStep(next)
+  }
+
+  const stepBack = () => {
+    setDemoStep((s) => Math.max(0, s - 1))
+  }
+
+  useEffect(() => {
+    if (!demoActive) return
+    const target = demoSteps[demoStep].target
+    const el = document.querySelector<HTMLElement>(`[data-demo-target="${target}"]`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [demoActive, demoStep])
+
+  const activeTarget = demoActive ? demoSteps[demoStep].target : null
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header />
       <main className="max-w-[1400px] mx-auto px-6 py-6 space-y-6">
+        <Hero />
+
         <KpiTiles documents={documents} />
+
+        <LifecyclePipeline
+          document={selected}
+          result={results[selected.id]}
+          isRunning={runningId === selected.id}
+        />
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
           <div className="xl:col-span-5 space-y-6">
+            <DemoSpotlight targetId="requests" activeTargetId={activeTarget}>
+              <RequestGenerationCard
+                documents={documents}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
+            </DemoSpotlight>
             <RequestQueue
               documents={documents}
               selectedId={selectedId}
               onSelect={setSelectedId}
             />
-            <DecisionLog entries={auditLog} />
+            <DemoSpotlight targetId="log" activeTargetId={activeTarget}>
+              <DecisionLog entries={auditLog} />
+            </DemoSpotlight>
           </div>
           <div className="xl:col-span-7 space-y-6">
-            <ValidationPanel
-              document={selected}
-              result={results[selected.id]}
-              isRunning={runningId === selected.id}
-              onRun={handleRun}
-            />
-            <DocumentViewer
-              document={selected}
-              result={results[selected.id]}
-            />
+            <DemoSpotlight
+              targetId="validation"
+              matches={['validation', 'decision']}
+              activeTargetId={activeTarget}
+            >
+              <ValidationPanel
+                document={selected}
+                result={results[selected.id]}
+                isRunning={runningId === selected.id}
+                onRun={() => handleRun()}
+              />
+            </DemoSpotlight>
+            <DemoSpotlight targetId="document" activeTargetId={activeTarget}>
+              <DocumentViewer
+                document={selected}
+                result={results[selected.id]}
+              />
+            </DemoSpotlight>
           </div>
         </div>
 
@@ -173,6 +258,17 @@ function App() {
           PBC Workflow demo · Front-end only · All integrations simulated in-memory
         </footer>
       </main>
+
+      <DemoPauseHint active={demoActive} onPause={exitDemo} />
+      <DemoModeControls
+        active={demoActive}
+        step={demoStep}
+        onStart={startDemo}
+        onExit={exitDemo}
+        onNext={advanceDemo}
+        onPrev={stepBack}
+        onRestart={restartDemo}
+      />
     </div>
   )
 }
