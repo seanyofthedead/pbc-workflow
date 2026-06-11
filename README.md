@@ -24,9 +24,28 @@ Other useful commands:
 
 ```bash
 npm run build      # type-check + production build
+npm run build:demo # bundle a single self-contained demo HTML file
 npm run lint       # eslint
 npm run preview    # serve the production build
 ```
+
+## Single-file demo (no server, no install)
+
+For sharing or presenting without a dev server, `npm run build:demo` bundles the
+real app into one self-contained HTML file at the repo root:
+
+```bash
+npm run build:demo
+# → writes pbc-workflow-demo.html (all JS + CSS inlined)
+```
+
+Open `pbc-workflow-demo.html` directly in any browser (double-click, or email it
+to someone) — it runs fully offline with no backend. This build uses a dedicated
+entry (`demo.html` → `src/demo-main.tsx`) that renders `<App />` directly,
+skipping the Amplify/Cognito `AuthGate` used by the hosted app. It's the same
+real app and components; only the sign-in gate is removed (all integrations are
+already simulated in-memory, so there's nothing to authenticate against). The
+single-file build is driven by `vite.demo.config.ts` via `vite-plugin-singlefile`.
 
 ## 5-minute demo script
 
